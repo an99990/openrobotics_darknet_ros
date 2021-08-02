@@ -12,7 +12,6 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(cv_bridge REQUIRED)
-find_package(darknet_vendor REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(sensor_msgs REQUIRED)
@@ -25,12 +24,21 @@ target_include_directories(openrobotics_darknet_ros PUBLIC include)
 target_compile_definitions(openrobotics_darknet_ros PRIVATE "DARKNET_ROS_BUILDING_DLL")
 ament_target_dependencies(openrobotics_darknet_ros
   cv_bridge
-  darknet_vendor
   sensor_msgs
   vision_msgs)
 
 add_library(detector_node SHARED
   src/detector_node.cpp)
+
+ 
+# set BUILD SHARE LIBS to off
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Do not make shared libs")
+
+# Add darknet submodule 
+add_subdirectory(darknet)
+
+# link submodule 
+target_link_libraries(openrobotics_darknet_ros dark)
 target_compile_definitions(detector_node PRIVATE "DARKNET_ROS_NODE_BUILDING_DLL")
 ament_target_dependencies(detector_node PUBLIC
   "rclcpp"
