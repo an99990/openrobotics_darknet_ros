@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <darknet_vendor/darknet_vendor.h>
-
+//#include <darknet.h> because had an error with set_batch, not defined in this scope. F
+//function was in network.h which already includes darknet.h
+#include <network.h>
 #include <fstream>
 #include <memory>
 #include <sstream>
@@ -36,7 +37,8 @@ public:
   ~DetectorNetworkPrivate()
   {
     if (network_) {
-      free_network(network_);
+      // changed free_network to free_network_ptr
+      free_network_ptr(network_);
       network_ = nullptr;
     }
   }
@@ -79,7 +81,6 @@ DetectorNetwork::DetectorNetwork(
     throw std::invalid_argument(str.str());
   }
 
-  // TODO(sloretz) what is this and why do examples set it?
   const int batch = 1;
   set_batch_network(impl_->network_, batch);
 
@@ -112,19 +113,19 @@ DetectorNetwork::detect(
   DarknetImage resized_image(
     letterbox_image(orig_image.image_, impl_->network_->w, impl_->network_->h));
 
-  // Ask network to make predictions
-  network_predict(impl_->network_, resized_image.image_.data);
+  // Ask network to make predictions, changed network_predict to network_predict_ptr
+  network_predict_ptr(impl_->network_, resized_image.image_.data);
 
   // Get predictions from network
   int num_detections = 0;
-  // TODO(sloretz) what do hier, map, and relative do?
   const float hier = 0;
   int * map = nullptr;
   const int relative = 0;
+  // added letter=0, last argument of function get_network_boxes
   detection * darknet_detections = get_network_boxes(
     impl_->network_, image_msg.width, image_msg.height, threshold,
     hier, map, relative,
-    &num_detections);
+    &num_detections,0);
 
   if (num_detections <= 0) {
     return 0;

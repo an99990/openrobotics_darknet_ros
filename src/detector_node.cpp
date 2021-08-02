@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <darknet_vendor/darknet_vendor.h>
+#include <darknet.h>
 
 #include <memory>
 #include <string>
