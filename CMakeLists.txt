@@ -10,9 +10,11 @@ if(NOT WIN32)
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+message("enabled CUDA")
 # enable CUDA
 enable_language(CUDA)
 find_package(CUDA REQUIRED)
+set(CMAKE_CUDA_ARCHITECTURES 52 60 61 75 CACHE STRING "CUDA architectures" FORCE)
 
 find_package(ament_cmake REQUIRED)
 find_package(cv_bridge REQUIRED)
