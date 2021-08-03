@@ -10,6 +10,10 @@ if(NOT WIN32)
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+# enable CUDA
+enable_language(CUDA)
+find_package(CUDA REQUIRED)
+
 find_package(ament_cmake REQUIRED)
 find_package(cv_bridge REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -29,7 +33,6 @@ ament_target_dependencies(openrobotics_darknet_ros
 
 add_library(detector_node SHARED
   src/detector_node.cpp)
-
  
 # set BUILD SHARE LIBS to off
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "Do not make shared libs")
@@ -50,6 +53,10 @@ add_executable(detector_node_main
   src/detector_node_main.cpp)
 target_link_libraries(detector_node_main detector_node)
 set_target_properties(detector_node_main PROPERTIES OUTPUT_NAME "detector_node")
+
+target_include_directories(darknet PUBLIC ${CUDA_INCLUDE_DIRS})
+  
+target_compile_definitions(darknet PUBLIC GPU=1)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
